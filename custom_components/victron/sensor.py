@@ -36,6 +36,7 @@ from .const import (
     ReadEntityType,
     TextReadEntityType,
     register_info_dict,
+    UINT16_MAX,
 )
 from .coordinator import victronEnergyDeviceUpdateCoordinator
 
@@ -181,7 +182,9 @@ class VictronSensor(CoordinatorEntity, SensorEntity):
                 if self.entity_type is not None and isinstance(
                     self.entity_type, TextReadEntityType
                 ):
-                    if data in {item.value for item in self.entity_type.decodeEnum}:
+                    if data in (UINT16_MAX, float(UINT16_MAX)):
+                        self._attr_native_value = None
+                    elif data in {item.value for item in self.entity_type.decodeEnum}:
                         self._attr_native_value = self.entity_type.decodeEnum(
                             data
                         ).name.split("_DUPLICATE")[0]
